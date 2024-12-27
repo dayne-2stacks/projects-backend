@@ -129,7 +129,8 @@ def detect():
             return Response(json.dumps({"error": "Processed file not found"}), status=500, mimetype="application/json")
 
         print(f"Sending file: {result_path}")
-        return send_file(result_path, mimetype='image/png', as_attachment=True, attachment_filename="annotated_image.png")
+        
+        return send_file(result_path, mimetype='image/png', as_attachment=True)
     except Exception as e:
         error_message = {"error": str(e)}
         print("Error during processing:", error_message)
