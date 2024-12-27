@@ -20,7 +20,7 @@ ALLOWED_ORIGINS = [
 ]
 
 # Configure CORS with allowed origins
-CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=True)
 
 
 
