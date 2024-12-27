@@ -123,6 +123,11 @@ def detect():
         if os.path.exists(input_path):
             os.remove(input_path)
 
+@app.route('/', methods=['GET'])
+def index():
+    return Response(json.dumps({"message": "You have successfully connected"}), status=200, mimetype="application/json")
+
+
 
 @app.route('/process', methods=['POST'])
 def process():
