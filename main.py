@@ -148,47 +148,40 @@ def index():
 
 @app.route('/process', methods=['POST'])
 def process():
-    if 'reference' not in request.files or 'input' not in request.files:
-        return Response(json.dumps({"error": "Both reference and input files must be uploaded"}), status=400, mimetype="application/json")
-
-    reference_file = request.files['reference']
-    input_file = request.files['input']
-
-    if reference_file.filename == '' or input_file.filename == '':
-        return Response(json.dumps({"error": "Both files must have valid names"}), status=400, mimetype="application/json")
-
-    input_path = os.path.join("/tmp", f"input_{input_file.filename}")
-    ref_path = os.path.join("/tmp", f"reference_{reference_file.filename}")
-
-    # Save files
     try:
+        if 'reference' not in request.files or 'input' not in request.files:
+            return jsonify({"error": "Both reference and input files must be uploaded"}), 400
+
+        reference_file = request.files['reference']
+        input_file = request.files['input']
+
+        if reference_file.filename == '' or input_file.filename == '':
+            return jsonify({"error": "Both files must have valid names"}), 400
+
+        input_path = os.path.join(tempfile.gettempdir(), f"input_{input_file.filename}")
+        ref_path = os.path.join(tempfile.gettempdir(), f"reference_{reference_file.filename}")
+
         reference_file.save(ref_path)
         input_file.save(input_path)
-        print(f"Files saved: ref_path={ref_path}, input_path={input_path}")
-        print(f"Reference file size: {os.path.getsize(ref_path)}, Input file size: {os.path.getsize(input_path)}")
-    except Exception as e:
-        return Response(json.dumps({"error": f"File saving failed: {str(e)}"}), status=500, mimetype="application/json")
 
-    try:
         # Process the images
         result_path = process_image(input_path, ref_path)
-        print(f"Result path: {result_path}")
 
-        if not result_path or not os.path.exists(result_path):
-            return Response(json.dumps({"error": "Image processing failed"}), status=500, mimetype="application/json")
+        if not os.path.exists(result_path):
+            return jsonify({"error": "Processed file not found"}), 500
 
         # Send the annotated image
         return send_file(result_path, mimetype='image/png', as_attachment=True)
+
     except Exception as e:
-        error_message = {"error": str(e)}
-        print(f"Error during processing: {error_message}")
-        return Response(json.dumps(error_message), status=500, mimetype="application/json")
+        logging.error(f"Error in /process endpoint: {e}")
+        return jsonify({"error": str(e)}), 500
+
     finally:
-        # Cleanup files
-        if os.path.exists(ref_path):
-            os.remove(ref_path)
-        if os.path.exists(input_path):
-            os.remove(input_path)
+        # Cleanup temporary files
+        for path in [input_path, ref_path]:
+            if os.path.exists(path):
+                os.remove(path)
 
 
 
