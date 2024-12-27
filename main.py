@@ -15,7 +15,7 @@ os.makedirs("uploads", exist_ok=True)
 
 # Specify allowed origins
 ALLOWED_ORIGINS = [
-    "https://portfolio-1-eight-rosy.vercel.app/",
+    "https://portfolio-1-eight-rosy.vercel.app",
     "http://localhost:3000",  # Localhost for development
 ]
 
