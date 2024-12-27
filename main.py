@@ -10,6 +10,8 @@ import tempfile
 from coinDetect import get_annotated_file
 
 app = Flask(__name__)
+os.makedirs("uploads", exist_ok=True)
+
 
 # Specify allowed origins
 ALLOWED_ORIGINS = [
