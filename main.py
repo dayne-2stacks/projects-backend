@@ -193,6 +193,14 @@ def process():
             os.remove(input_path)
 
 
+@app.after_request
+def apply_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
+    return response
+
+
 if __name__ == "__main__":
     os.makedirs("uploads", exist_ok=True)
     app.run(host="0.0.0.0", port=5000)
