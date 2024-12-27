@@ -112,11 +112,9 @@ def detect():
     input_file = request.files['input']
 
     if input_file.filename == '':
-        return Response(json.dumps({"error": "Input file must have valid name"}), status=400, mimetype="application/json")
+        return Response(json.dumps({"error": "Input file must have a valid name"}), status=400, mimetype="application/json")
     
     input_path = os.path.join("/tmp", f"input_{input_file.filename}")
-
-    # input_path = os.path.join("uploads", f"input_{input_file.filename}")
     input_file.save(input_path)
 
     try:
@@ -125,8 +123,13 @@ def detect():
         if "error" in result_path:
             return jsonify(result_path), 400
 
-        # Send the annotated image
-        return send_file(result_path, mimetype='image/png')
+        # Debug: Check if the file exists and size
+        if not os.path.exists(result_path) or os.path.getsize(result_path) == 0:
+            print(f"File not found or empty: {result_path}")
+            return Response(json.dumps({"error": "Processed file not found"}), status=500, mimetype="application/json")
+
+        print(f"Sending file: {result_path}")
+        return send_file(result_path, mimetype='image/png', as_attachment=True, attachment_filename="annotated_image.png")
     except Exception as e:
         error_message = {"error": str(e)}
         print("Error during processing:", error_message)
@@ -134,6 +137,7 @@ def detect():
     finally:
         if os.path.exists(input_path):
             os.remove(input_path)
+
 
 @app.route('/', methods=['GET'])
 def index():
