@@ -10,7 +10,15 @@ import tempfile
 from coinDetect import get_annotated_file
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from your frontend
+
+# Specify allowed origins
+ALLOWED_ORIGINS = [
+    "https://portfolio-1-eight-rosy.vercel.app/",
+    "http://localhost:3000",  # Localhost for development
+]
+
+# Configure CORS with allowed origins
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
 
 
