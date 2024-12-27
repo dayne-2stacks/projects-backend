@@ -157,37 +157,30 @@ def process():
 
     if reference_file.filename == '' or input_file.filename == '':
         return Response(json.dumps({"error": "Both files must have valid names"}), status=400, mimetype="application/json")
-    
-
 
     # Save the uploaded files
     input_path = os.path.join("/tmp", f"input_{input_file.filename}")
     ref_path = os.path.join("/tmp", f"reference_{reference_file.filename}")
-
-    # ref_path = os.path.join("uploads", f"reference_{reference_file.filename}")
-    # input_path = os.path.join("uploads", f"input_{input_file.filename}")
     reference_file.save(ref_path)
     input_file.save(input_path)
-    
+
+    # Debug logs
+    print(f"Saved reference file at: {ref_path}")
+    print(f"Saved input file at: {input_path}")
 
     try:
         # Process the images
-        # result = process_image(ref_path, input_path)
-        
-        # # Debug: Log the structure and types of the result
-        # print("Result:", result)
-        # print("Result types:", {key: type(value) for key, value in result.items()})
-
-        # # Ensure JSON serialization
-        # response = json.dumps(result)
-        # return Response(response, status=200, mimetype="application/json")
-    
+        print(f"Processing files: input_path={input_path}, ref_path={ref_path}")
         result_path = process_image(input_path, ref_path)
-        if "error" in result_path:
-            return jsonify(result_path), 400
+        print(f"Result path from process_image: {result_path}")
+
+        if not os.path.exists(result_path) or os.path.getsize(result_path) == 0:
+            print(f"File not found or empty: {result_path}")
+            return Response(json.dumps({"error": "Processed file not found"}), status=500, mimetype="application/json")
 
         # Send the annotated image
-        return send_file(result_path, mimetype='image/png')
+        print(f"Sending file: {result_path}")
+        return send_file(result_path, mimetype='image/png', as_attachment=True)
     except Exception as e:
         error_message = {"error": str(e)}
         print("Error during processing:", error_message)
