@@ -114,7 +114,9 @@ def detect():
     if input_file.filename == '':
         return Response(json.dumps({"error": "Input file must have valid name"}), status=400, mimetype="application/json")
     
-    input_path = os.path.join("uploads", f"input_{input_file.filename}")
+    input_path = os.path.join("/tmp", f"input_{input_file.filename}")
+
+    # input_path = os.path.join("uploads", f"input_{input_file.filename}")
     input_file.save(input_path)
 
     try:
@@ -154,8 +156,11 @@ def process():
 
 
     # Save the uploaded files
-    ref_path = os.path.join("uploads", f"reference_{reference_file.filename}")
-    input_path = os.path.join("uploads", f"input_{input_file.filename}")
+    input_path = os.path.join("/tmp", f"input_{input_file.filename}")
+    ref_path = os.path.join("/tmp", f"reference_{reference_file.filename}")
+
+    # ref_path = os.path.join("uploads", f"reference_{reference_file.filename}")
+    # input_path = os.path.join("uploads", f"input_{input_file.filename}")
     reference_file.save(ref_path)
     input_file.save(input_path)
     
